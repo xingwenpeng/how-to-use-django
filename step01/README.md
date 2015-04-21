@@ -1,16 +1,16 @@
-1.生成数据库文件
+# 1.生成数据库文件
 python3 manage.py migrate 
 
-2.运行自带服务器
+# 2.运行自带服务器
 python3 manage.py runserver
 
-3.打开浏览器察看,看到欢迎界面
+# 3.打开浏览器察看,看到欢迎界面
 127.0.0.1:8000
 
-4.创建app
+# 4.创建app
 python3 startapp blog
 
-5.修改settings.py,添加'blog'应用
+# 5.修改settings.py,添加'blog'应用
     INSTALLED_APPS = (
         'django.contrib.admin',
         'django.contrib.auth',
@@ -21,7 +21,7 @@ python3 startapp blog
         ***'blog',***
     )
 
-6.创建view视图,打开 'blog/views.py'
+# 6.创建view视图,打开 'blog/views.py'
 
     from django.shortcuts import render_to_response
 
@@ -29,7 +29,7 @@ python3 startapp blog
         return render_to_response("login.html")
 
 
-7.创建关联view的模版文件,login.html
+# 7.创建关联view的模版文件,login.html
 
     <!DOCTYPE html>
     <html>
@@ -42,7 +42,7 @@ python3 startapp blog
     </body>
     </html>
 
-8.设置urls.py，增加路由
+# 8.设置urls.py，增加路由
 
     urlpatterns = [
         # Examples:
@@ -53,9 +53,9 @@ python3 startapp blog
         ***url(r'^blog/$', 'blog.views.register'),***
     ]
 
-9.启动django自带的web服务器
+# 9.启动django自带的web服务器
 python3 manage.py runserver
 
 
-10.打开浏览器察看,看到"helloworld"界面
+# 10.打开浏览器察看,看到"helloworld"界面
 127.0.0.1:8000/blog
