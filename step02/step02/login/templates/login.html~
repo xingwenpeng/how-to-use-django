@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>我拍我世界</title></title>
+</head>
+<body>
+	{% if user_login.error %}
+	<p>error !</p>
+	{% endif %}
+	<form action="" method="post">
+		<table>
+			{{ user_login.as_table }}		
+		</table>
+		<input type="submit" value="登录"></input>
+	</form>	
+	{{ user_login }}
+	
+</body>
+</html>
