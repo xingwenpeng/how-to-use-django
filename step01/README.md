@@ -1,14 +1,14 @@
 # 1.生成数据库文件
-python3 manage.py migrate 
+    python3 manage.py migrate 
 
 # 2.运行自带服务器
-python3 manage.py runserver
+    python3 manage.py runserver
 
 # 3.打开浏览器察看,看到欢迎界面
-127.0.0.1:8000
+    127.0.0.1:8000
 
 # 4.创建app
-python3 startapp blog
+    python3 startapp blog
 
 # 5.修改settings.py,添加'blog'应用
     INSTALLED_APPS = (
@@ -54,8 +54,8 @@ python3 startapp blog
     ]
 
 # 9.启动django自带的web服务器
-python3 manage.py runserver
+    python3 manage.py runserver
 
 
 # 10.打开浏览器察看,看到"helloworld"界面
-127.0.0.1:8000/blog
+    127.0.0.1:8000/blog
