@@ -1,0 +1,325 @@
+
+nginx注意事项
+nginx安装步骤
+1.下载nginx-1.6.2.tar.gz
+2.解压缩并进入原码根目录
+	tar zxvf nginx-1.6.2.tar.gz; cd nginx-1.6.2
+3.检测安装环境，此处可传递nginx安装配置参数，暂时使用默认安装
+	./configure
+4.编译
+	make
+5.安装
+	sudo make install
+6.用root身份启动nginx
+	sudo /usr/local/nginx/sbin/nginx
+
+7.浏览器打开网址http://127.0.0.1:80,如看到nginx欢迎界面，则成功安装nginx
+  
+python环境安装
+如果是ubuntu14.04，已经默认安装python2.7和python3.4,或从python官网下载python3.4的安装包,但符号链接python默认指向了python2.7,为了方便其间修改它指向3.4
+
+sudo rm /usr/bin/python
+sudo ln -s /opt/python3.4.2/bin/python3.4(你python3.4可执行文件的位置) /usr/bin/python 
+
+Django编译
+1.Django官网下载Django-1.8.tar.gz安装包
+2.解压缩并进入原码目录
+	tar zxvf Django-1.8.tar.gz
+	cd Django-1.8
+
+3.安装，在安装过程中如果你的环境缺少某些python组件，有可能会安装失败，根据提示信息，百度安装其缺少的插件。
+	sudo python setup.py install
+
+创建第一个Django项目，进行环境测试
+1.回到你的用户目录下，创建一个新目录 
+	mkdir ~/django_demo
+2.Django创建项目，如果django-admin.py找不到，查看你的PATH环境变量并设置
+	django-admin.py startproject helloworld
+3.创建应用
+	cd helloworld
+	django-admin.py startapp blog
+4.修改~/django_demo/helloworld/helloworld/settings.py , 增加'blog'应用，注意，此处为元组，后面','别忘加。另把时区修改成上海时区
+	
+	# Application definition
+
+	INSTALLED_APPS = ( 
+	    'django.contrib.admin',
+	    'django.contrib.auth',
+	    'django.contrib.contenttypes',
+	    'django.contrib.sessions',
+	    'django.contrib.messages',
+	    'django.contrib.staticfiles',
+	    'blog',
+	)
+	...
+	TIME_ZONE='Asia/Shanghai'
+
+5.数据库相关的module记录生成，记录数据库的变化
+	python manage.py makemigrations
+6.数据库更新，根据两次makemigrations判断是否需要更新数据库中的表
+	python manage.py migrate
+
+7.启动Django自带开发服务器 
+	python manage.py runserver
+
+
+8.浏览器打开网址http://127.0.0.1:8000,如看到django欢迎界面，则成功安装django
+
+9.如果开发app，需修改urls.py文件，确定views里的函数和templates目录里html文件的对应关系
+
+10.如有数据库，需在settings.py  中的注释掉含csrf的那一句
+	MIDDLEWARE_CLASSES = (
+		...
+	 #    'django.middleware.csrf.CsrfViewMiddleware',
+		...
+	)
+
+	
+启动
+/usr/local/nginx/sbin/nginx 
+
+停止
+/usr/local/nginx/sbin/nginx  -s stop
+
+从新加载配置文件
+/usr/local/nginx/sbin/nginx  -s reload
+
+默认加载配置文件，可通过启动nginx时参数'-c'指定配置文件路径，最好把nginx.conf放在项目里，方便部署？？
+/usr/local/nginx/conf/nginx.conf
+
+nginx.conf核心配置，重点是uwsgi那个配置
+		 server {
+			listen       80;
+			server_name  localhost;
+
+			#charset koi8-r;
+
+			#access_log  logs/host.access.log  main;
+
+			location / { 
+			    include uwsgi_params;
+			    uwsgi_pass 127.0.0.1:9090;
+			    uwsgi_param UWSGI_CHDIR /home/xingwenpeng/photo/project/helloworld;
+		#uwsgi_param UWSGI_SCRIPT django_wsgi;
+			    uwsgi_param UWSGI_SCRIPT helloworld.wsgi;
+			    access_log /usr/local/nginx/logs/access.log;
+
+			}
+
+			location /static {
+			    root /home/xingwenpeng/photo/project/helloworld;
+			}
+
+
+uwsgi配置使用
+1.下载uwsgi-2.0.10.tar.gz
+2.编译安装
+	tar zxvf uwsgi-2.0.10.tar.gz
+	cd uwsgi-2.0.10
+	sudo python setup.py install
+
+3.测试uwsgi，创建test.py文件，进行单文件测试
+
+	# test.py
+	def application(env, start_response):
+		start_response('200 OK', [('Content-Type','text/html')])
+		return [b"Hello  itcast"] # python3
+    
+4.启动uwsgi，进行测试。                                   
+	uwsgi --http 127.0.0.1:9090 --wsgi-file test.py
+
+5.打开浏览器，输入127.0.0.1:8000如果看到'Hello itcast'则uwsgi安装成功。
+
+Mysql数据库安装
+
+1.ubuntu下直接apt-get 下载安装
+	sudo apt-get install mysql-server mysql-client libmysqlclient-dev
+	安装过程中需要给mysql设置一个root帐号
+
+2.登录mysql，进行测试
+	mysql -uroot -ppassword
+	show databases;
+	show tables;
+	
+数据库建表
+#用户注册表，用户名和用户邮箱唯一
+#用户id	用户名	注册邮箱	注册时间
+
+create table user_register
+(
+user_id int(12) primary key not null auto_increment,
+user_name varchar(30) unique not null,
+user_email varchar(30) unique not null,
+register_date datetime
+)character set utf8;
+
+
+#插入测试数据
+insert into user_register(user_name, user_email, register_date) values("aa", "aa@qq.com", now());
+insert into user_register(user_name, user_email, register_date) values("bb", "bb@qq.com", now());
+insert into user_register(user_name, user_email, register_date) values("cc", "cc@qq.com", now());
+insert into user_register(user_name, user_email, register_date) values("dd", "dd@qq.com", now());
+insert into user_register(user_name, user_email, register_date) values("ee", "ee@qq.com", now());
+
+
+#上传照片表
+#图片id		图片路径	图片大小	图片类型	浏览次数	上传者id	上传时间
+
+
+create table pr
+(
+photo_id int(12) primary key not null auto_increment,
+photo_path varchar(30)  not null,
+photo_size int  not null,
+photo_type varchar(8) not null,
+browse_times int default 0,
+user_id int(12) not null,
+photo_date datetime
+)character set utf8;
+
+#插入上传图片测试数据
+insert into pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/aa.png",123,"png",0,1,now());
+insert into pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/11.png",1432,"png",0,1,now());
+insert into pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/22.png",1232,"jpg",0,1,now());
+
+insert into pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/bb.png",322,"jpg",0,3,now());
+insert into pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/cc.png",456,"jpg",0,2,now());
+insert into pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/dd.png",2000,"png",0,2,now());
+
+#查询用户id对应的上传图片
+select photo_path,photo_id from pr where user_id=1;
+
+#统计图片类型
+select photo_type, count(*) as total from pr group by photo_type;
+
+
+	
+
+3.c++链接mysql
+
+4.python链接mysql
+
+python3链接mysql的组件为pymysql，需要下载安装
+
+1>. github上安装pymysql,或者用我提供给你的原码包
+
+    git clone https://github.com/PyMySQL/PyMySQL.git
+
+2>. 安装需要有root权限
+
+    cd PyMySQL
+    sudo python3 setup.py install
+
+3>. 在python文件中直接导入
+    
+    import pymysql
+
+4>. 为了能兼容之前的代码，python2.7前的mysql组件为mysqldb
+
+    import pysql as mysqldb
+
+5>. 运行一个python操作mysql的例子
+
+对于mysql来说，如果使用支持事务的存储引擎，那么每次操作后，commit是必须的，否则不会真正写入数据库，对应rollback可以进行相应的回滚，但是commit后是无法再rollback的。commit() 可以在执行很多sql指令后再一次调用，这样可以适当提升性能。
+
+
+#mysqldb    
+import  pymysql
+
+#连接    
+conn=pymysql.connect(host="localhost",user="root",passwd="itcast",db="user_db",charset="utf8")
+cursor = conn.cursor()
+
+#写入    
+sql = "insert into user_register(user_name,user_email, register_date) values(%s,%s,now())"
+param = ("xxcc",'xs@163.com')
+n = cursor.execute(sql,param)
+print(n)
+#更新    
+sql = "update user_register set user_id=%s where user_id=15"
+param = ('7')
+n = cursor.execute(sql,param)
+print(n)
+
+#查询    
+n = cursor.execute("select * from user_register")
+for row in cursor.fetchall():
+    for r in row:
+        print(r)
+
+#删除    
+sql = "delete from user_register where user_id=%s"
+param =("17")
+n = cursor.execute(sql,param)
+print(n)
+
+#提交到数据库，相当于save
+conn.commit()
+#关闭游标
+cursor.close()
+#关闭数据库链接    
+conn.close()
+
+
+nginx+django+uwsgi+mysql联奏
+
+1.用django-admin.py创建hello项目，或着直接使用前面创建好的hello项目，具体步骤请参见前面内容。
+
+2.在hello项目根目录下，创建uwsgi的启动配置文件uwsgi_socket.xml，输入以下内容
+
+	#uwsgi_socket.xml
+	<uwsgi>
+	    <socket>127.0.0.1:9090</socket>
+	    <chdir>/home/xingwenpeng/photo/project/helloworld</chdir>
+	    <module>helloworld.wsgi</module>
+	    <processes>4</processes>
+	    <daemonize>uwsgi.log</daemonize>
+	</uwsgi>
+
+3.创建数据库，添加测试数据内容
+
+
+4.启动nginx
+	
+
+5.根据指定的配置文件启动
+	uwsgi -x uwsgi_socket.xml 
+
+	或者启动时指定ip端口和加载的模块
+	uwsgi -s 127.0.0.1:9090 --module helloworld.wsgi
+
+	module名就是django的项目名加wsgi后缀，在项目的settings文件里可以看到
+
+6.打开浏览器，输入127.0.0.1：80/app目录名/函数，如果出现指定函数对应的页面，则环境测试成功
+
+
+
+7. 杀死所有uwsgi进程。此处给大家留做任务，编写uwsgi的管理脚本，放到/etc/init.d下
+	killall -9 uwsgi
+
+
+
+另：python第三方库中常用的安装命令
+	sudo python setup.py install
+
+
+
+
+insert into login_user_register(user_name, user_email, register_date) values("aa", "aa@qq.com", now());
+insert into login_user_register(user_name, user_email, register_date) values("bb", "bb@qq.com", now());
+insert into login_user_register(user_name, user_email, register_date) values("cc", "cc@qq.com", now());
+insert into login_user_register(user_name, user_email, register_date) values("dd", "dd@qq.com", now());
+insert into login_user_register(user_name, user_email, register_date) values("ee", "ee@qq.com", now());
+
+
+insert into login_pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/aa.png",123,"png",0,1,now());
+insert into login_pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/11.png",1432,"png",0,1,now());
+insert into login_pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/22.png",1232,"jpg",0,1,now());
+
+insert into login_pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/bb.png",322,"jpg",0,3,now());
+insert into login_pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/cc.png",456,"jpg",0,2,now());
+insert into login_pr(photo_path,photo_size,photo_type,browse_times,user_id,photo_date) values("/tmp/dd.png",2000,"png",0,2,now());
+
+~                                                                                                                                               
+~                          
+
