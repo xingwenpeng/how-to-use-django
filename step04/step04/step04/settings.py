@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+e^x50ui9pkoi&by5lsqb1dudtv4payhjri5^lr*l#o3qhgd*i'
+SECRET_KEY = '6(rrl9iug3@o8cienlx-1f1%f^7(mfl%x1bp(7_itdedm=kmpo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,13 +37,14 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'login',
+    'myapp',
+    'otherapp',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-#    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -75,27 +76,20 @@ WSGI_APPLICATION = 'step04.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'step04_db',
-        'USER': 'root',
-        'PASSWORD': 'itcast',
-        'HOST': '',
-        'PORT': '',
-        'OPTIONS': {
-            'autocommit':True,
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Shanghai'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -108,3 +102,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+PROJECT_DIR = os.path.dirname(__file__)  
+
+
+STATICFILES_DIRS = (
+        os.path.join(PROJECT_DIR, '../project_static'),
+)
+
+STATICFILES_FINDERS = (
+        "django.contrib.staticfiles.finders.FileSystemFinder",
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',   
+        'django.contrib.staticfiles.finders.DefaultStorageFinder', 
+)
